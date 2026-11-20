@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Đảo Đèn Lồng</title></head>
+<body><main>
+<canvas id="world" aria-label="Đảo nổi, người giữ đèn và năm trụ đèn"></canvas>
+<header><small>ĐÊM 01</small><h1>Đảo Đèn Lồng</h1><p>Gom đom đóm để thắp sáng năm ngọn đèn.</p></header>
+<section class="panel" aria-label="Trạng thái trò chơi"><div id="lamps" aria-label="Tiến độ đèn"></div>
+<dl><div><dt>Lửa</dt><dd id="flames"></dd></div><div><dt>Đom đóm</dt><dd id="carried"></dd></div><div><dt>Điểm</dt><dd id="score"></dd></div><div><dt>Còn lại</dt><dd id="time"></dd></div></dl></section>
+<footer><span><kbd>WASD</kbd> Di chuyển</span><span><kbd>J</kbd> Nhảy</span><span><kbd>E</kbd> Nạp đèn</span><span><kbd>F / Space</kbd> Xung sáng</span></footer>
+<aside id="result" hidden><h2 id="message"></h2><button id="restart">Chơi lại</button></aside>
+</main><script type="module" src="/src/client/main.ts"></script></body></html>
