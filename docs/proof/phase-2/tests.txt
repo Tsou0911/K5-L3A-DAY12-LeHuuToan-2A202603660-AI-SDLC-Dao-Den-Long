@@ -1,0 +1,242 @@
+
+> dao-den-long@0.1.0 test
+> npm run build:headless && esbuild tests/phase-1.test.ts --bundle --platform=node --format=esm --outfile=dist/tests/phase-1.test.js && node --test dist/tests/phase-1.test.js tests/phase-2.test.mjs
+
+
+> dao-den-long@0.1.0 build:headless
+> esbuild scripts/headless.ts --bundle --platform=node --format=esm --outfile=dist/headless.js
+
+
+  dist\headless.js  31.6kb
+
+Done in 20ms
+
+  dist\tests\phase-1.test.js  39.4kb
+
+Done in 24ms
+TAP version 13
+# Subtest: tick zero applies scenario by id without scoring or modifying defaults
+ok 1 - tick zero applies scenario by id without scoring or modifying defaults
+  ---
+  duration_ms: 2.7815
+  type: 'test'
+  ...
+# Subtest: seed controls world and repeated simulations match
+ok 2 - seed controls world and repeated simulations match
+  ---
+  duration_ms: 9.2362
+  type: 'test'
+  ...
+# Subtest: normalized movement and camera-relative forward
+ok 3 - normalized movement and camera-relative forward
+  ---
+  duration_ms: 0.8934
+  type: 'test'
+  ...
+# Subtest: pickup consumes one mote; scoring waits for deposit
+ok 4 - pickup consumes one mote; scoring waits for deposit
+  ---
+  duration_ms: 0.4687
+  type: 'test'
+  ...
+# Subtest: last deposit lights lantern, wins, freezes score and tick
+ok 5 - last deposit lights lantern, wins, freezes score and tick
+  ---
+  duration_ms: 0.5734
+  type: 'test'
+  ...
+# Subtest: pulse spends energy, pushes, stuns, and respects cooldown
+ok 6 - pulse spends energy, pushes, stuns, and respects cooldown
+  ---
+  duration_ms: 0.6628
+  type: 'test'
+  ...
+# Subtest: shade damage drops carried motes, then protects for ninety ticks
+ok 7 - shade damage drops carried motes, then protects for ninety ticks
+  ---
+  duration_ms: 11.9581
+  type: 'test'
+  ...
+# Subtest: loss on last flame and timeout
+ok 8 - loss on last flame and timeout
+  ---
+  duration_ms: 0.7826
+  type: 'test'
+  ...
+# Subtest: partial input, idle defaults and rising edges
+ok 9 - partial input, idle defaults and rising edges
+  ---
+  duration_ms: 0.8508
+  type: 'test'
+  ...
+# Subtest: reject malformed scenario and input
+ok 10 - reject malformed scenario and input
+  ---
+  duration_ms: 1.8572
+  type: 'test'
+  ...
+# Subtest: contract rejects negative tuning and blank commands and fills omissions
+ok 11 - contract rejects negative tuning and blank commands and fills omissions
+  ---
+  duration_ms: 0.3624
+  type: 'test'
+  ...
+# Subtest: scenario reserves explicit IDs before naming anonymous entities
+ok 12 - scenario reserves explicit IDs before naming anonymous entities
+  ---
+  duration_ms: 0.6239
+  type: 'test'
+  ...
+# Subtest: pickup and hit height limits, pulse sphere and safe zone boundaries
+ok 13 - pickup and hit height limits, pulse sphere and safe zone boundaries
+  ---
+  duration_ms: 0.4816
+  type: 'test'
+  ...
+# Subtest: fall damage and final flame have consistent events
+ok 14 - fall damage and final flame have consistent events
+  ---
+  duration_ms: 0.2062
+  type: 'test'
+  ...
+# Subtest: reinforcements report the ID inserted into the world
+ok 15 - reinforcements report the ID inserted into the world
+  ---
+  duration_ms: 6.3407
+  type: 'test'
+  ...
+# Subtest: move limits and all four rising edges
+ok 16 - move limits and all four rising edges
+  ---
+  duration_ms: 0.9248
+  type: 'test'
+  ...
+# Subtest: CLI emits rounded snapshots, immediate events, default interval and identical bytes
+ok 17 - CLI emits rounded snapshots, immediate events, default interval and identical bytes
+  ---
+  duration_ms: 867.8611
+  type: 'test'
+  ...
+# Subtest: CLI rejects broken JSON and invalid structures with status 2 and stderr
+ok 18 - CLI rejects broken JSON and invalid structures with status 2 and stderr
+  ---
+  duration_ms: 1662.4907
+  type: 'test'
+  ...
+# Subtest: three night configurations and scheduled spawns
+ok 19 - three night configurations and scheduled spawns
+  ---
+  duration_ms: 1609.611
+  type: 'test'
+  ...
+# Subtest: pause stops all simulation clocks; dash on air holds height for twelve ticks; facing starts +Z
+ok 20 - pause stops all simulation clocks; dash on air holds height for twelve ticks; facing starts +Z
+  ---
+  duration_ms: 434.1279
+  type: 'test'
+  ...
+# Subtest: fall ignores immunity and only hits once, respawn at tick 61
+ok 21 - fall ignores immunity and only hits once, respawn at tick 61
+  ---
+  duration_ms: 453.0926
+  type: 'test'
+  ...
+# Subtest: drop ring and TTL; sorted single hit and drifter steals before shade
+ok 22 - drop ring and TTL; sorted single hit and drifter steals before shade
+  ---
+  duration_ms: 1244.4488
+  type: 'test'
+  ...
+# Subtest: charm refresh, free dashes, respawn after 2700 sim ticks
+ok 23 - charm refresh, free dashes, respawn after 2700 sim ticks
+  ---
+  duration_ms: 1772.4428
+  type: 'test'
+  ...
+# Subtest: drifter steals in safe zone despite immunity, releases motes when pulsed in flee
+ok 24 - drifter steals in safe zone despite immunity, releases motes when pulsed in flee
+  ---
+  duration_ms: 1629.2091
+  type: 'test'
+  ...
+# Subtest: last tick wins, safe boundary expels shade and prevents damage
+ok 25 - last tick wins, safe boundary expels shade and prevents damage
+  ---
+  duration_ms: 671.2737
+  type: 'test'
+  ...
+# Subtest: jump pads, bridge, tower, night-three warning interval and seeded wind
+ok 26 - jump pads, bridge, tower, night-three warning interval and seeded wind
+  ---
+  duration_ms: 2403.7517
+  type: 'test'
+  ...
+# Subtest: acceleration, air control, jump and braking; grounded input cannot double-jump
+ok 27 - acceleration, air control, jump and braking; grounded input cannot double-jump
+  ---
+  duration_ms: 682.0258
+  type: 'test'
+  ...
+# Subtest: pulse refreshes an existing stun, pushes 4 m in 15 ticks and refuses insufficient fuel
+ok 28 - pulse refreshes an existing stun, pushes 4 m in 15 ticks and refuses insufficient fuel
+  ---
+  duration_ms: 1470.5789
+  type: 'test'
+  ...
+# Subtest: new random mote waits until next tick; occupied points skip spawning
+ok 29 - new random mote waits until next tick; occupied points skip spawning
+  ---
+  duration_ms: 2179.4061
+  type: 'test'
+  ...
+# Subtest: drifter chased away by pulse cannot steal and disappears after 240 simulation ticks
+ok 30 - drifter chased away by pulse cannot steal and disappears after 240 simulation ticks
+  ---
+  duration_ms: 726.0941
+  type: 'test'
+  ...
+# Subtest: partial deposit resolves ties by ID, loss has priority over lit lamps
+ok 31 - partial deposit resolves ties by ID, loss has priority over lit lamps
+  ---
+  duration_ms: 1384.7759
+  type: 'test'
+  ...
+# Subtest: dash never prevents contact; charm speed and second pickup refresh
+ok 32 - dash never prevents contact; charm speed and second pickup refresh
+  ---
+  duration_ms: 1505.1253
+  type: 'test'
+  ...
+# Subtest: pause freezes TTL, charm respawn and shade scheduling
+ok 33 - pause freezes TTL, charm respawn and shade scheduling
+  ---
+  duration_ms: 498.3824
+  type: 'test'
+  ...
+# Subtest: shade detection, release and speed use the active night
+ok 34 - shade detection, release and speed use the active night
+  ---
+  duration_ms: 1428.0075
+  type: 'test'
+  ...
+# Subtest: bridge supports grounded travel and open water does not; ramps climb and walls block
+ok 35 - bridge supports grounded travel and open water does not; ramps climb and walls block
+  ---
+  duration_ms: 1815.2527
+  type: 'test'
+  ...
+# Subtest: wind cancels by scenario; drifters idle when eligibility is lost
+ok 36 - wind cancels by scenario; drifters idle when eligibility is lost
+  ---
+  duration_ms: 965.7227
+  type: 'test'
+  ...
+1..36
+# tests 36
+# suites 0
+# pass 36
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 23683.8762

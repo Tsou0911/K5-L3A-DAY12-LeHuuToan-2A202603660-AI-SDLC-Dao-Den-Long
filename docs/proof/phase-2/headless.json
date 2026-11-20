@@ -1,0 +1,65 @@
+{
+  "node": "v26.13.1",
+  "platform": "win32",
+  "pickup": {
+    "command": "node dist/headless.js --night 1 --ticks 60 --seed 42 --snapshot-every 10 --scenario scenarios/one-mote.json --out docs/proof/phase-2/one-mote.jsonl",
+    "elapsed_ms": 73.0538,
+    "bytes": 4747,
+    "sha256": "070c359c5f1dea57004a01c17064729d40e6b0cd1dc48443b67842f87b858211",
+    "end": {
+      "type": "end",
+      "ticks": 60,
+      "state": "playing",
+      "score": 0
+    }
+  },
+  "win": {
+    "command": "node dist/headless.js --night 1 --ticks 60 --seed 42 --snapshot-every 1 --scenario scenarios/win-one-lantern.json --inputs scenarios/interact.inputs.json --out docs/proof/phase-2/final-lantern.jsonl",
+    "elapsed_ms": 75.84909999999999,
+    "bytes": 1656,
+    "sha256": "9fc9967e77f24913e616892b140bd4e9fa175a32c15130885267d2b8eac1f73f",
+    "end": {
+      "type": "end",
+      "ticks": 1,
+      "state": "won",
+      "score": 948
+    }
+  },
+  "replay_a": {
+    "command": "node dist/headless.js --night 2 --ticks 1201 --seed 42 --snapshot-every 120 --inputs scenarios/phase-2/dash-pause.inputs.json --out docs/proof/phase-2/replay-a.jsonl",
+    "elapsed_ms": 124.64330000000004,
+    "bytes": 23605,
+    "sha256": "17cd81afb9a9cca6bc25810b2cdd8a2dee4408579b661805d7c116e17e629ff7",
+    "end": {
+      "type": "end",
+      "ticks": 1201,
+      "state": "playing",
+      "score": 0
+    }
+  },
+  "replay_b": {
+    "command": "node dist/headless.js --night 2 --ticks 1201 --seed 42 --snapshot-every 120 --inputs scenarios/phase-2/dash-pause.inputs.json --out docs/proof/phase-2/replay-b.jsonl",
+    "elapsed_ms": 118.60990000000004,
+    "bytes": 23605,
+    "sha256": "17cd81afb9a9cca6bc25810b2cdd8a2dee4408579b661805d7c116e17e629ff7",
+    "end": {
+      "type": "end",
+      "ticks": 1201,
+      "state": "playing",
+      "score": 0
+    }
+  },
+  "identical_bytes": true,
+  "full": {
+    "command": "node dist/headless.js --night 3 --ticks 21600 --seed 42 --snapshot-every 60 --scenario scenarios/phase-2/full-night.json --inputs scenarios/phase-2/full-night.inputs.json --out docs/proof/phase-2/night-3.jsonl",
+    "elapsed_ms": 1748.0446000000002,
+    "bytes": 1172876,
+    "sha256": "62da172ea73d4abfe5e7212bedfdb36e5ae2f02f4638ffe0cc91fb7ec83fcffe",
+    "end": {
+      "type": "end",
+      "ticks": 21600,
+      "state": "lost",
+      "score": 0
+    }
+  }
+}

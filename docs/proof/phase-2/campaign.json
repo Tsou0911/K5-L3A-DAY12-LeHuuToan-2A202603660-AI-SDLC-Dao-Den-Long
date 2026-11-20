@@ -1,0 +1,17 @@
+{
+  "fixture": "one deposit from victory per night",
+  "checks": [
+    {
+      "night": 1,
+      "result": "Đảo đã sáng đèn · 948 điểm"
+    },
+    {
+      "night": 2,
+      "result": "Đảo đã sáng đèn · 1008 điểm"
+    },
+    {
+      "night": 3,
+      "result": "Bình Minh · 3024 điểm"
+    }
+  ]
+}

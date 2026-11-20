@@ -1,10 +1,10 @@
-# Đảo Đèn Lồng
+# Đảo Đèn Lồng — Hướng dẫn Phase 2
 
-Game 3D trên trình duyệt. Trong đêm đầu tiên, Mây có ba ngọn lửa và năm phút để thắp năm đèn trên đảo. Mỗi đèn cần ba đom đóm. Đi vào vùng sáng để tránh sát thương của Bóng Mực.
+Game 3D trên trình duyệt. Mây đi qua ba đêm và ba hòn đảo, thu thập đom đóm, thắp Đèn Lồng Lớn, tránh Bóng Mực và đối phó với Gió Lạc.
 
-## Cài và chơi
+## Cài đặt, build và chạy
 
-Dùng Node.js 22.12+ với npm trên Windows, macOS hoặc Linux. Chạy tại thư mục chứa `package.json`, rồi mở địa chỉ Vite in trong terminal.
+Cần Node.js 22.12 trở lên. Từ thư mục dự án:
 
 ```sh
 npm install
@@ -12,16 +12,50 @@ npm run build
 npm run dev
 ```
 
-Dùng **WASD** để đi, **J** để nhảy, **E** để nạp đèn, **F** hoặc **Space** để phát xung. Đom đóm được nhặt tự động. Sau khi kết thúc, chọn **Chơi lại**.
+Mở địa chỉ local mà Vite in trong terminal. Nếu PowerShell chặn `npm.ps1`, thay `npm` bằng `npm.cmd`. Bản web build nằm ở `dist/client/`; CLI headless nằm ở `dist/headless.js`.
 
-## Điểm và kiểm thử
+## Điều khiển
 
-Mỗi đom đóm nhặt được cộng 10 điểm, mỗi đèn vừa thắp cộng 500 điểm và mỗi Bóng Mực mới bị choáng cộng 50 điểm. Khi thắng, mỗi giây tròn còn lại cộng 2 điểm và mỗi lửa còn lại cộng 100 điểm.
+- **W / A / S / D** hoặc **phím mũi tên**: di chuyển.
+- **J**: nhảy; **Shift**: lướt.
+- **E**: nạp đom đóm vào đèn gần nhất.
+- **F** hoặc **Space**: Tỏa Sáng.
+- **V**: chuyển giữa camera thứ ba và camera nhìn từ trên xuống.
+- **Kéo chuột trái**: xoay camera; độ nhạy có thể chỉnh trong Cài đặt.
+- **P / Esc**: tạm dừng.
 
-Chạy `npm test` để kiểm tra engine và CLI. Sau khi build, lệnh dưới đây dựng bốn đèn đã sáng, nạp ba mote cho đèn cuối ở tick đầu và ghi replay thắng vào `win.jsonl`.
+Đom đóm được nhặt tự động khi tới gần. Đèn đã sáng tạo vùng an toàn khỏi Bóng Mực. Gió Lạc có thể cướp đom đóm; dùng Tỏa Sáng đúng lúc để xua chúng hoặc lấy lại số đom đóm đã cướp. Bùa Gió tăng tốc chạy và bỏ hồi chiêu lướt trong thời gian hiệu lực.
+
+## Ba đêm
+
+| Đêm | Đảo | Đèn | Thời gian | Đặc điểm |
+|---|---|---:|---:|---|
+| 1 | Đảo Bến | 5 | 5:00 | Đảo tròn và các điểm sương quanh mép |
+| 2 | Đảo Cau | 6 | 5:30 | Hai đảo nối bằng cầu tre và hai bục nhảy |
+| 3 | Đảo Chuông | 7 | 6:00 | Ba tầng, dốc, tháp chuông và gió mạnh |
+
+Mỗi đêm bắt đầu với ba Ngọn Lửa. Thắp hết đèn để thắng đêm; hết giờ hoặc hết lửa thì thua. Sau khi thua, có thể chơi lại đêm đó. Thắng cả ba đêm sẽ hiện Bình Minh và tổng điểm chiến dịch.
+
+## Tính điểm
+
+- Nạp mỗi đom đóm: **10 điểm**.
+- Thắp mỗi đèn: **100 điểm**.
+- Mỗi Bóng Mực trúng Tỏa Sáng: **5 điểm**.
+- Khi thắng một đêm: `floor(giây còn lại) × 2 + 50 × số Ngọn Lửa còn`.
+- Điểm chiến dịch cộng các đêm đã thắng.
+
+Số liệu chuẩn và Test Contract v1.1 được khai báo trong [`game.contract.json`](game.contract.json); giả định và tiêu chí nghiệm thu ở [`docs/notes/phase-2.md`](docs/notes/phase-2.md).
+
+## Test và headless
 
 ```sh
-node dist/headless.js --seed 42 --night 1 --ticks 60 --scenario scenarios/win-one-lantern.json --inputs scenarios/interact.inputs.json --snapshot-every 1 --out win.jsonl
+npm test
 ```
 
-Bản web sau build ở `dist/client/`. CLI ở `dist/headless.js`. [Lệnh kiểm thử và headless](AGENTS.md) · [Quy ước dữ liệu và cách tính điểm](docs/notes/phase-1.md) · [Bằng chứng Phase 1](docs/proof/phase-1/README.md).
+Ví dụ chạy Night 3 đến hết 21.600 tick:
+
+```sh
+node dist/headless.js --seed 42 --night 3 --ticks 21600 --scenario scenarios/phase-2/full-night.json --inputs scenarios/phase-2/full-night.inputs.json --snapshot-every 60 --out night-3.jsonl
+```
+
+`npm run build` tạo CLI trước khi chạy. Snapshot/event được ghi JSONL; dòng cuối là `end`. Scenario, replay, FPS, ảnh và hướng dẫn kiểm chứng nằm trong [`docs/proof/phase-2/README.md`](docs/proof/phase-2/README.md).

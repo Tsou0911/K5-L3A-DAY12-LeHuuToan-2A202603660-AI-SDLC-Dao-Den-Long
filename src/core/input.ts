@@ -2,9 +2,9 @@ import { number, record } from './contract'
 import { fields, vector } from './scenario'
 import type { HeadlessInput, InputFrame } from './types'
 
-export const actions = ['jump','interact','pulse','dash'] as const
+export const actions = ['jump','interact','pulse','dash','pause'] as const
 export function idle(): HeadlessInput {
-  return { move: [0,0], cam_yaw_deg: 0, jump: false, interact: false, pulse: false, dash: false }
+  return { move: [0,0], cam_yaw_deg: 0, jump: false, interact: false, pulse: false, dash: false, pause: false }
 }
 export function parseInputs(raw: unknown): InputFrame[] {
   let list = raw

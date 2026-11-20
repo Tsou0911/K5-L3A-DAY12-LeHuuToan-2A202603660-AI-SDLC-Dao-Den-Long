@@ -1,0 +1,29 @@
+{
+  "platform": "win32",
+  "os": "10.0.26200",
+  "cpu": "Intel(R) Core(TM) Ultra 7 356H",
+  "mode": "production WebGL, night 1",
+  "follow": {
+    "frames": 826,
+    "elapsed_ms": 5004.799999999999,
+    "fps": 165.04156010230182,
+    "width": 1280,
+    "height": 720,
+    "gpu": "ANGLE (Intel, Intel(R) Graphics (0x0000B0A0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36 Edg/157.0.0.0",
+    "start": "4:59",
+    "end": "4:54"
+  },
+  "overhead": {
+    "frames": 826,
+    "elapsed_ms": 5004.900000000001,
+    "fps": 165.0382625027473,
+    "width": 1280,
+    "height": 720,
+    "gpu": "ANGLE (Intel, Intel(R) Graphics (0x0000B0A0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36 Edg/157.0.0.0",
+    "start": "4:53",
+    "end": "4:48"
+  },
+  "mean_fps": 165.03991128605253
+}

@@ -2,9 +2,10 @@
 <html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Đảo Đèn Lồng</title></head>
 <body><main>
 <canvas id="world" aria-label="Đảo nổi, người giữ đèn và năm trụ đèn"></canvas>
-<header><small>ĐÊM 01</small><h1>Đảo Đèn Lồng</h1><p>Gom đom đóm để thắp sáng năm ngọn đèn.</p></header>
+<header><small id="night">ĐÊM 01</small><h1>Đảo Đèn Lồng</h1><p>Gom đom đóm và mang về những ngọn đèn trên đảo.</p></header>
 <section class="panel" aria-label="Trạng thái trò chơi"><div id="lamps" aria-label="Tiến độ đèn"></div>
-<dl><div><dt>Lửa</dt><dd id="flames"></dd></div><div><dt>Đom đóm</dt><dd id="carried"></dd></div><div><dt>Điểm</dt><dd id="score"></dd></div><div><dt>Còn lại</dt><dd id="time"></dd></div></dl></section>
-<footer><span><kbd>WASD</kbd> Di chuyển</span><span><kbd>J</kbd> Nhảy</span><span><kbd>E</kbd> Nạp đèn</span><span><kbd>F / Space</kbd> Xung sáng</span></footer>
-<aside id="result" hidden><h2 id="message"></h2><button id="restart">Chơi lại</button></aside>
+<dl><div><dt>Lửa</dt><dd id="flames"></dd></div><div><dt>Đom đóm</dt><dd id="carried"></dd></div><div><dt>Điểm</dt><dd id="score"></dd></div><div><dt>Còn lại</dt><dd id="time"></dd></div></dl><div id="bag" aria-label="Túi đom đóm"></div><p id="cooldowns"></p><p id="hint"></p></section>
+<div id="beacon" hidden aria-label="Hướng đèn chưa sáng"></div>
+<footer><span><kbd>WASD</kbd> Di chuyển</span><span><kbd>J</kbd> Nhảy</span><span><kbd>E</kbd> Nạp đèn</span><span><kbd>F / Space</kbd> Xung sáng</span><span><kbd>Shift</kbd> Lướt</span><span><kbd>V</kbd> Camera</span><span><kbd>P / Esc</kbd> Tạm dừng</span></footer>
+<aside id="result" hidden><h2 id="message"></h2><p id="dialog-note"></p><div id="settings" hidden><label>Âm lượng <input id="volume" type="range" min="0" max="100"></label><label>Độ nhạy chuột <input id="sensitivity" type="range" min="1" max="100"></label></div><div class="buttons"><button id="primary">Bắt đầu</button><button id="restart">Chơi lại đêm</button><button id="options">Cài đặt</button><button id="menu">Về menu</button></div></aside>
 </main><script type="module" src="/src/client/main.ts"></script></body></html>
