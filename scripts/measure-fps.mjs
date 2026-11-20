@@ -1,7 +1,7 @@
 // Run against a production preview with a local Chromium DevTools port.
 import {writeFileSync,mkdirSync} from 'node:fs'
 import {cpus,release,platform} from 'node:os'
-const out='docs/proof/phase-2'
+const out='docs/proof/phase-3'
 mkdirSync(out,{recursive:true})
 import {connect} from './browser-session.mjs'
 const {send,js,wait,key,close}=await connect(process.argv[2])

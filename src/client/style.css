@@ -12,3 +12,5 @@ body{color:#f5f1e6}header{top:72px;left:24px}header h1{font-size:24px}header p{d
 footer{bottom:12px;gap:12px}aside{z-index:3;min-width:min(420px,90vw)}aside h2{font-size:34px}
 .buttons{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}label{display:block;margin:15px 0}
 [hidden]{display:none!important}#dialog-note{color:#f5f1e6;font-size:15px}
+.colorblind .urgent{color:#fff}
+#settings input[type=checkbox]{accent-color:#00b3ff}

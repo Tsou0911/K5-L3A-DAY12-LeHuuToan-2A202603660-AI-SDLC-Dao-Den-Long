@@ -16,11 +16,12 @@ const empty: Scenario = {motes:[], shades:[]}
 test('tick zero applies scenario by id without scoring or modifying defaults', () => {
   const engine = new GameEngine(7,{...empty, lanterns:[{id:'L4',lit:true}]})
   const s = engine.snapshot()
-  assert.deepEqual([s.tick,s.score,s.state,s.time_left_s],[0,0,'playing',300])
+  assert.deepEqual([s.tick,s.score,s.state,s.time_left_s],[0,0,'playing',240])
   assert.deepEqual(s.player.pos,[0,0,0])
   assert.equal(s.player.flames,3)
   assert.deepEqual(s.lanterns.map(l => l.id),['L1','L2','L3','L4','L5'])
-  assert.deepEqual(s.lanterns.map(l => l.deposited),[0,0,0,10,0])
+  assert.deepEqual(s.lanterns.map(l => l.deposited),[0,0,0,5,0])
+  assert.deepEqual([s.lanterns[3].fuel,s.lanterns[3].ever_lit,s.player.capacity],[100,true,10])
   s.player.pos[0] = 99
   assert.equal(engine.snapshot().player.pos[0],0)
 })
@@ -44,13 +45,17 @@ test('pickup consumes one mote; scoring waits for deposit', () => {
   assert.deepEqual([a.snapshot().player.carried,a.snapshot().score,a.snapshot().motes.length],[1,0,0])
   assert.deepEqual(a.step(),[])
 })
-test('last deposit lights lantern, wins, freezes score and tick', () => {
-  const a = new GameEngine(2,parseScenario(win))
-  assert.deepEqual(a.step({...idle(),interact:true}).map(e=>e.name),['deposit','lantern_lit','game_over'])
-  const s = a.snapshot()
-  assert.deepEqual([s.state,s.player.carried,s.lanterns[0].deposited,s.score],['won',0,10,948])
-  a.step()
-  assert.deepEqual(a.snapshot(),s)
+test('lighting all lanterns does not win early; dawn survival awards the v1.2 score', () => {
+  const scenario=parseScenario(win)
+  const early=new GameEngine(2,scenario)
+  assert.deepEqual(early.step({...idle(),interact:true}).map(e=>e.name),['deposit','lantern_lit'])
+  assert.deepEqual([early.snapshot().state,early.snapshot().score,early.snapshot().player.capacity],['playing',150,12])
+  const dawn=new GameEngine(2,{...scenario,time_left_s:1/HZ})
+  assert.deepEqual(dawn.step({...idle(),interact:true}).map(e=>e.name),['deposit','lantern_lit','game_over'])
+  const s=dawn.snapshot()
+  assert.deepEqual([s.state,s.player.carried,s.lanterns[0].deposited,s.lanterns[0].fuel,s.score],['won',0,10,100,1046])
+  assert.deepEqual(dawn.step(),[])
+  assert.deepEqual(dawn.snapshot(),s)
 })
 test('pulse spends energy, pushes, stuns, and respects cooldown', () => {
   const a = new GameEngine(0,{motes:[], player:{carried:4}, shades:[{id:'S',pos:[1,0,0]}]})
@@ -91,6 +96,7 @@ test('reject malformed scenario and input', () => {
 })
 test('contract rejects negative tuning and blank commands and fills omissions', () => {
   assert.equal(validateContract({...contract,tuning:{score:{per_stun:7}}}).tuning.player_speed,6)
+  assert.throws(()=>validateContract({...contract,contract_version:'1.1'}))
   assert.throws(()=>validateContract({...contract,headless_cmd:' '}))
   assert.throws(()=>validateContract({...contract,tuning:{score:{per_stun:-1}}}))
   assert.throws(()=>validateContract({...contract,tuning:{pulse_radius:-1}}))
@@ -111,7 +117,7 @@ test('pickup and hit height limits, pulse sphere and safe zone boundaries', () =
   assert.deepEqual(a.step({...idle(),interact:true,pulse:true}),[
     {type:'event',tick:1,name:'mote_picked',data:{carried:10}},
     {type:'event',tick:1,name:'deposit',data:{lantern_id:'L1',amount:7,deposited:10}},
-    {type:'event',tick:1,name:'lantern_lit',data:{lantern_id:'L1'}},
+    {type:'event',tick:1,name:'lantern_lit',data:{lantern_id:'L1',relight:false}},
     {type:'event',tick:1,name:'pulse',data:{stunned_ids:['S1']}}
   ])
   const setup: Scenario = {motes:[],shades:[{pos:[0,1.5,0]}],player:{carried:5}}
@@ -164,9 +170,9 @@ test('CLI emits rounded snapshots, immediate events, default interval and identi
   const [zero,start,pick,pulse,ten,twenty,end] = rows
   assert.deepEqual(start,{type:'event',tick:0,name:'night_start',data:{night:1}})
   assert.deepEqual(Object.keys(zero).sort(),['type','tick','sim_tick','state','time_left_s','score','player','lanterns','shades','motes_active','motes','night','wind','drifters','charms'].sort())
-  assert.deepEqual(zero.player,{pos:[0.123,0,0],flames:3,carried:2,vel:[0,0,0],grounded:true,invuln:false,dash_cd_s:0,pulse_cd_s:0,charm_s:0})
+  assert.deepEqual(zero.player,{pos:[0.123,0,0],flames:3,carried:2,vel:[0,0,0],grounded:true,invuln:false,capacity:10,dash_cd_s:0,pulse_cd_s:0,charm_s:0})
   assert.deepEqual(zero.shades,[{id:'S1',pos:[2,1,0],state:'wander'}])
-  assert.deepEqual(zero.lanterns[0],{id:'L1',pos:[0,0,25],lit:false,deposited:0})
+  assert.deepEqual(zero.lanterns[0],{id:'L1',pos:[0,0,25],deposited:0,lit:false,fuel:0,ever_lit:false,relit_count:0})
   assert.deepEqual([zero.tick,zero.sim_tick,zero.score,zero.motes_active],[0,0,0,1])
   assert.deepEqual(pick,{type:'event',tick:1,name:'mote_picked',data:{carried:3}})
   assert.deepEqual(pulse,{type:'event',tick:1,name:'pulse',data:{stunned_ids:['S1']}})

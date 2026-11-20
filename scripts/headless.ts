@@ -14,8 +14,9 @@ function outputSnapshot(s: Snapshot) {
     time_left_s: s.time_left_s, score: s.score,
     player: {pos: position(s.player.pos), flames: s.player.flames, carried: s.player.carried,
       vel: position(s.player.vel), grounded: s.player.grounded, invuln: s.player.invuln_ticks > 0,
-      dash_cd_s: s.player.dash_cd/HZ, pulse_cd_s: s.player.cooldown_ticks/HZ, charm_s: s.player.charm_ticks/HZ},
-    lanterns: s.lanterns.map(l => ({...l, pos: position(l.pos)})),
+      capacity:s.player.capacity,dash_cd_s: s.player.dash_cd/HZ, pulse_cd_s: s.player.cooldown_ticks/HZ, charm_s: s.player.charm_ticks/HZ},
+    lanterns: s.lanterns.map(l => ({id:l.id,pos:position(l.pos),deposited:l.deposited,lit:l.lit,
+      fuel:Number(l.fuel.toFixed(1)),ever_lit:l.ever_lit,relit_count:l.relit_count})),
     shades: s.shades.map(shade => ({
       id: shade.id, pos: position(shade.pos), state: shade.state
     })),

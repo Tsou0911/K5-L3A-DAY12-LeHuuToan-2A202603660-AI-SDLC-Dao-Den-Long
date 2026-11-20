@@ -1,5 +1,7 @@
 # Phase 2 — Ticket-02 acceptance criteria and assumptions
 
+Historical Contract v1.1 specification for tag `phase-2`. Ticket-03 / Contract v1.2 supersedes the earlier lantern, victory, duration, and scoring rules; see [`phase-3.md`](phase-3.md) for current behavior.
+
 This document records the Phase 2 implementation against Ticket-02 “Ba hòn đảo.” The ticket is the source of truth; `game.contract.json` is the executable tuning contract.
 
 ## Standard rules

@@ -1,5 +1,7 @@
 # Phase 2 verification and evidence
 
+Historical evidence for tag `phase-2` / Contract v1.1. Phase 3 changes the gameplay contract; use `docs/proof/phase-3/README.md` for current verification.
+
 Run commands from the repository root after installing dependencies and building. On Windows PowerShell, use `npm.cmd` if `npm` is blocked by Execution Policy.
 
 ## Automated tests and build

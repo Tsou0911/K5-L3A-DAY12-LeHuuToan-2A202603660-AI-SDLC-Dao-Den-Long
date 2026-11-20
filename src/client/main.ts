@@ -51,6 +51,7 @@ scarf.position.y=.95
 keeper.add(cloak,head,hat,scarf)
 scene.add(keeper)
 const lamps = new Map<string,THREE.Mesh>()
+const lampDetails=new Map<string,{tear:THREE.Mesh;barBackground:THREE.Mesh;barFill:THREE.Mesh}>()
 const motes = new Map<string,THREE.Mesh>()
 const shades = new Map<string,THREE.Mesh>()
 const moteShape = mesh(new THREE.OctahedronGeometry(.18),0xfff6c2,0xffe58a)
@@ -68,6 +69,11 @@ ribbon.computeVertexNormals()
 const silk=mesh(ribbon,0x8fa3b8);silk.material.side=THREE.DoubleSide
 const leaves=Array.from({length:9},()=>{const leaf=mesh(new THREE.OctahedronGeometry(.22),0xc9b48a);leaf.scale.set(1,.22,.55);scene.add(leaf);return leaf})
 const rim=mesh(orb,0x7a3cff);rim.scale.setScalar(1.07);rim.material.side=THREE.BackSide;shadeShape.add(rim)
+const eyeLeft=mesh(new THREE.SphereGeometry(.07,6,6),0x7a3cff)
+const eyeRight=eyeLeft.clone()
+eyeLeft.name='eye-left';eyeRight.name='eye-right'
+eyeLeft.position.set(-.17,.08,.42);eyeRight.position.set(.17,.08,.42)
+shadeShape.add(eyeLeft,eyeRight)
 function sync(list: Entity[], objects: Map<string, THREE.Mesh>, shape: THREE.Mesh, y: number) {
   const alive = new Set(list.map(item => item.id))
   for (const [id,m] of objects) if (!alive.has(id)) { scene.remove(m); objects.delete(id) }
@@ -89,7 +95,7 @@ function show(next: Screen) {
   el('result').hidden = next === 'play'
   el('settings').hidden = next !== 'settings'
   el('message').textContent = {menu:'Đảo Đèn Lồng',intro:'Đêm '+night+' · '+islands[night].title,play:'',pause:'Tạm dừng',settings:'Cài đặt',
-    result:state.state === 'won' && night===3 ? 'Bình Minh · '+total+' điểm' : state.state === 'won' ? 'Đảo đã sáng đèn · '+state.score+' điểm' : 'Đêm đã khép lại'}[next]
+    result:state.state === 'won' && night===3 ? 'Bình Minh · '+total+' điểm' : state.state === 'won' ? 'Đã giữ đảo sáng đến bình minh · '+state.score+' điểm' : 'Đêm đã khép lại'}[next]
   el('primary').textContent = next === 'pause' ? 'Tiếp tục' : next === 'settings' ? 'Quay lại' : next === 'intro' ? 'Vào đảo' : 'Bắt đầu'
   if(next==='result')el('primary').textContent='Đêm kế tiếp'
   el('dialog-note').textContent=next==='intro'?['Ông Đăng: Con hãy gom ánh sáng về bến.','Ông Đăng: Qua cầu tre, con sẽ thấy những lá bùa đỏ.','Ông Đăng: Hãy nghe tiếng gió trước khi lên tháp chuông.'][night-1]:''
@@ -119,8 +125,12 @@ function draw(s: Snapshot) {
     if(m.material===shadeShape.material)m.material=shadeShape.material.clone()
     ;(m.material as THREE.MeshStandardMaterial).color.setHex(shade.state==='stunned'?0x3a3450:0x120a1a)
   }
+  const shadeAccent=colorblind.checked?0x00b3ff:0x7a3cff
+  rim.material.color.setHex(shadeAccent)
+  eyeLeft.material.color.setHex(shadeAccent)
+  eyeRight.material.color.setHex(shadeAccent)
   const lit=s.lanterns.filter(l=>l.lit).length
-  ambient.intensity=.15+.55*lit/s.lanterns.length
+  ambient.intensity=.15+.55*s.lanterns.reduce((sum,l)=>sum+l.fuel/contract.tuning.fuel_max,0)/s.lanterns.length
   for (const lamp of s.lanterns) {
     let light = lamps.get(lamp.id)
     if (!light) {
@@ -131,26 +141,44 @@ function draw(s: Snapshot) {
       const roof = mesh(new THREE.ConeGeometry(.61,.38,8),0x5c3c49)
       roof.position.y = 1.55
       const core=mesh(new THREE.SphereGeometry(.24,8,6),0xffe9b0,0xffe9b0);core.position.y=-.31;light.add(core)
+      const tear=mesh(new THREE.ConeGeometry(.08,.14,3),0x241d2a);tear.position.set(0,.12,.4);tear.rotation.z=Math.PI;light.add(tear)
       post.add(light,roof)
       const safeRing=mesh(new THREE.RingGeometry(contract.tuning.safe_radius-.05,contract.tuning.safe_radius,80),0xffb347,0x3b2915)
       safeRing.rotation.x=-Math.PI/2;safeRing.position.y=-.99;safeRing.name='zone';post.add(safeRing)
+      const barBackground=mesh(new THREE.BoxGeometry(.85,.13,.04),0x211d2b)
+      barBackground.position.y=2.1;post.add(barBackground)
+      const barFill=mesh(new THREE.BoxGeometry(.79,.07,.05),0xffb347,0xffb347)
+      barFill.position.y=2.1;post.add(barFill)
       scene.add(post)
       lamps.set(lamp.id,light)
+      lampDetails.set(lamp.id,{tear,barBackground,barFill})
     }
     const mat=light.material as THREE.MeshStandardMaterial
+    const blink=lamp.fuel>=contract.tuning.low_fuel_threshold||Math.floor(s.sim_tick/30)%2===0
+    light.visible=!lamp.lit||blink
+    light.scale.y=lamp.lit?1:.8
     mat.color.setHex(lamp.lit?0xffb347:0x5b5f6e);mat.emissive.setHex(lamp.lit?0xffb347:0)
     light.children[0].visible=lamp.lit
-    light.parent!.getObjectByName('zone')!.visible=lamp.lit
+    const zone=light.parent!.getObjectByName('zone')!
+    zone.visible=lamp.lit&&lamp.fuel>=contract.tuning.low_fuel_threshold
+    const details=lampDetails.get(lamp.id)!
+    details.tear.visible=!lamp.lit
+    details.barBackground.visible=lamp.lit&&blink
+    details.barFill.visible=lamp.lit&&blink
+    const fraction=lamp.fuel/contract.tuning.fuel_max
+    details.barFill.scale.x=fraction
+    details.barFill.position.x=-.395+.395*fraction
   }
   el('flames').textContent = String(s.player.flames)
-  el('carried').textContent = String(s.player.carried)
+  el('carried').textContent = s.player.carried+' / '+s.player.capacity
   el('score').textContent = String(s.score)
   const sec = Math.ceil(s.time_left_s)
-  el('time').textContent = Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')
+  const urgent=s.time_left_s <= 30
+  el('time').textContent = (colorblind.checked&&urgent?'⚠ ':'')+Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')
   el('lamps').textContent = lit+' / '+s.lanterns.length+' đèn'
-  el('bag').textContent = '◆'.repeat(s.player.carried)+'◇'.repeat(contract.tuning.carry_capacity-s.player.carried)
+  el('bag').textContent = s.player.carried+' / '+s.player.capacity+'  '+'◆'.repeat(s.player.carried)+'◇'.repeat(s.player.capacity-s.player.carried)
   el('cooldowns').textContent = '↠ Lướt '+(s.player.dash_cd/HZ).toFixed(1)+' s · ✷ Xung '+(s.player.cooldown_ticks/HZ).toFixed(1)+' s'
-  el('time').classList.toggle('urgent',s.time_left_s <= 30)
+  el('time').classList.toggle('urgent',urgent)
   const [x,y,z] = s.player.pos
   const h = Math.max(0,y)
   const range = overhead ? .01 : 11
@@ -162,8 +190,10 @@ function draw(s: Snapshot) {
   camera.lookAt(targetPos)
   camera.updateMatrixWorld()
   const rangeTo = (l: Entity) => Math.hypot(l.pos[0]-x,l.pos[2]-z)
-  const target = s.lanterns.filter(l => !l.lit).sort((a,b)=>rangeTo(a)-rangeTo(b))[0]
-  el('hint').textContent = target && rangeTo(target)<=contract.tuning.interact_radius ? 'E — Nạp ánh sáng ('+target.deposited+'/'+contract.tuning.lantern_cost+')' : ''
+  const target = s.lanterns.filter(l => !l.lit||l.fuel<contract.tuning.fuel_max)
+    .sort((a,b)=>rangeTo(a)-rangeTo(b)||a.id.localeCompare(b.id,'en',{numeric:true}))[0]
+  el('hint').textContent = target && rangeTo(target)<=contract.tuning.interact_radius
+    ? 'E — '+(target.lit?'Châm dầu ('+Math.floor(target.fuel)+'%)':'Thắp đèn ('+target.deposited+'/'+(target.ever_lit?contract.tuning.relight_cost:contract.tuning.lantern_cost)+')') : ''
   const beacon = el('beacon')
   beacon.hidden = true
   if (target && screen === 'play') {
@@ -207,12 +237,19 @@ window.addEventListener('blur', clearInput)
 document.addEventListener('visibilitychange', () => { if (document.hidden) clearInput() })
 const volume = el('volume') as HTMLInputElement
 const sensitivity = el('sensitivity') as HTMLInputElement
+const colorblind = el('colorblind') as HTMLInputElement
 for (const slider of [volume,sensitivity]) {
   slider.value = localStorage.getItem('island.'+slider.id) ?? '45'
   slider.oninput = () => {
     localStorage.setItem('island.'+slider.id,slider.value)
     gameAudio.volume(Number(volume.value)/100)
   }
+}
+colorblind.checked=localStorage.getItem('island.colorblind')==='true'
+document.body.classList.toggle('colorblind',colorblind.checked)
+colorblind.onchange=()=>{
+  localStorage.setItem('island.colorblind',String(colorblind.checked))
+  document.body.classList.toggle('colorblind',colorblind.checked)
 }
 canvas.addEventListener('pointermove', e => {
   if (screen === 'play' && e.buttons === 1) cameraYaw -= e.movementX*Number(sensitivity.value)*.0001
@@ -242,6 +279,7 @@ function restart() {
   terrains.forEach((g,i)=>g.visible=i===night-1)
   for(const light of lamps.values())if(light.parent)scene.remove(light.parent)
   lamps.clear()
+  lampDetails.clear()
   el('night').textContent='ĐÊM 0'+night
   state = engine.snapshot()
   clearInput()

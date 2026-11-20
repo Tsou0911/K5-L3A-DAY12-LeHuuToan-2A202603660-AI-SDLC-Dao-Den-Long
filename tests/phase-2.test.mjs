@@ -5,7 +5,7 @@ import {tmpdir} from 'node:os'
 import {join} from 'node:path'
 import {execFileSync} from 'node:child_process'
 
-const dir=mkdtempSync(join(tmpdir(),'island-v11-'))
+const dir=mkdtempSync(join(tmpdir(),'island-v12-'))
 const empty={motes:[],shades:[],drifters:[]}
 let runId=0
 function run(night,ticks,scenario={},inputs=[],every=1){
@@ -18,7 +18,7 @@ function run(night,ticks,scenario={},inputs=[],every=1){
   return {records,at:k=>records.find(s=>s.type==='snapshot'&&s.tick===k),events:n=>records.filter(s=>s.name===n),end:records.at(-1)}
 }
 test('three night configurations and scheduled spawns',()=>{
-  for(const [night,duration,count,interval] of [[1,300,5,480],[2,330,6,420],[3,360,7,360]]){
+  for(const [night,duration,count,interval] of [[1,240,5,480],[2,270,6,420],[3,300,7,360]]){
     const r=run(night,300+interval,{},[],1)
     const zero=r.at(0)
     assert.deepEqual([zero.night,zero.time_left_s,zero.lanterns.length,zero.motes.length,zero.shades.length],[night,duration,count,20,0])
@@ -77,11 +77,14 @@ test('drifter steals in safe zone despite immunity, releases motes when pulsed i
   const spawn=run(3,1201,{random_shades:false,motes:[]},[],1)
   assert.equal(spawn.at(1199).drifters.length,0);assert.equal(spawn.at(1200).drifters[0].id,'D1')
 })
-test('last tick wins, safe boundary expels shade and prevents damage',()=>{
+test('last tick dawn wins at the new score and expels a shade without damage',()=>{
   const lamps=['L1','L2','L3','L4','L5'].map((id,i)=>i?{id,lit:true}:{id,pos:[0,0,0],deposited:9})
   const r=run(1,60,{player:{carried:1},motes:[],shades:[{pos:[0,0,0]}],time_left_s:1/60,lanterns:lamps},[{tick:0,interact:true}])
-  assert.deepEqual(r.end,{type:'end',ticks:1,state:'won',score:260})
-  assert.equal(r.at(1).shades[0].pos[0],6)
+  assert.deepEqual(r.end,{type:'end',ticks:1,state:'won',score:1001})
+  assert.equal(r.events('game_over')[0].data.reason,'dawn_survived')
+  assert.equal(r.events('player_hit').length,0)
+  assert.equal(r.at(1).shades[0].state,'wander')
+  assert.ok(r.at(1).shades[0].pos[0]>0&&r.at(1).shades[0].pos[0]<6)
 })
 test('jump pads, bridge, tower, night-three warning interval and seeded wind',()=>{
   const ferry=run(2,100,{...empty,player:{pos:[20,0,18]}},[{tick:0,move:[-1,0]}])
@@ -127,7 +130,7 @@ test('partial deposit resolves ties by ID, loss has priority over lit lamps',()=
   const s={...empty,lanterns:[{id:'L2',pos:[1,0,0]},{id:'L1',pos:[-1,0,0]}],player:{carried:3}}
   const r=run(1,2,s,[{tick:0,interact:true}])
   assert.deepEqual(r.events('deposit')[0].data,{lantern_id:'L1',amount:3,deposited:3})
-  assert.equal(r.at(2).score,30);assert.equal(r.at(2).lanterns[0].lit,false)
+  assert.equal(r.at(2).score,15);assert.equal(r.at(2).lanterns[0].lit,false)
   const last=run(1,1,{...empty,player:{pos:[45,-11,0],flames:1},lanterns:['L1','L2','L3','L4','L5'].map(id=>({id,lit:true}))})
   assert.equal(last.events('game_over')[0].data.reason,'no_flames')
 })

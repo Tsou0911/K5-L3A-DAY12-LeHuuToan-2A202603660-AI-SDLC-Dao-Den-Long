@@ -19,15 +19,16 @@ export function parseScenario(raw:unknown,night:Night=1):Scenario{
   for(const k of ['random_motes','random_shades'])if(k in s && typeof s[k]!=='boolean')nonnegative(s[k])
   if('player' in s){
     const p=record(s.player)
-    fields(p,['pos','vel','grounded','carried','flames','invuln_ticks','dash_cd_ticks','pulse_cd_ticks','charm_ticks'])
+    fields(p,['pos','vel','grounded','carried','successful_lights','flames','invuln_ticks','dash_cd_ticks','pulse_cd_ticks','charm_ticks'])
     for(const [k,v] of Object.entries(p)){
       if(k==='pos'||k==='vel')vector(v,3)
       else if(k==='grounded')bool(v)
       else nonnegative(v)
     }
-    if(Number(p.carried)>contract.tuning.carry_capacity)throw Error('Capacity exceeded')
+    const capacity=Math.min(contract.tuning.capacity_max,contract.tuning.carry_capacity+2*Number(p.successful_lights??0))
+    if(Number(p.carried??0)>capacity)throw Error('Capacity exceeded')
   }
-  const lists={motes:[],shades:['stun_ticks','state','state_ticks_left'],lanterns:['deposited','lit'],drifters:['state','stolen','state_ticks_left'],charms:['available','respawn_ticks','respawn_s']}
+  const lists={motes:[],shades:['stun_ticks','state','state_ticks_left','target_lantern_id'],lanterns:['deposited','lit','fuel','ever_lit','relit_count'],drifters:['state','stolen','state_ticks_left'],charms:['available','respawn_ticks','respawn_s']}
   const prefixes={motes:'M',shades:'S',drifters:'D',charms:'C',lanterns:'L'}
   for(const k of Object.keys(lists) as (keyof typeof lists)[]){
     if(!(k in s))continue
@@ -49,7 +50,22 @@ export function parseScenario(raw:unknown,night:Night=1):Scenario{
       if(k==='lanterns'){
         if(!islands[night].lamps.some((_,i)=>e.id==='L'+(i+1)))throw Error('Unknown lantern')
         if('lit' in e)bool(e.lit)
-        if('deposited' in e){const n=nonnegative(e.deposited),cost=contract.tuning.lantern_cost;if(n>cost||('lit' in e && e.lit!==(n===cost)))throw Error('Inconsistent lantern')}
+        if('ever_lit' in e)bool(e.ever_lit)
+        const everLit=Boolean(e.ever_lit??e.lit??false)
+        const cost=everLit?contract.tuning.relight_cost:contract.tuning.lantern_cost
+        const deposited='deposited' in e?nonnegative(e.deposited):0
+        const lit=Boolean(e.lit??(deposited>=cost))
+        const fuel='fuel' in e?number(e.fuel,0):lit?contract.tuning.fuel_max:0
+        if(fuel>contract.tuning.fuel_max||(!lit&&fuel!==0)||(lit&&fuel===0))throw Error('Inconsistent lantern fuel')
+        if(lit&&!everLit)throw Error('Lit lantern must have ever_lit')
+        if(deposited>cost||(!lit&&deposited>=cost)||(lit&&deposited!==0&&deposited<cost))throw Error('Inconsistent lantern deposit')
+        e.ever_lit=everLit||lit
+        e.lit=lit
+        e.fuel=fuel
+        e.deposited=lit?(deposited||cost):deposited
+        if('relit_count' in e)nonnegative(e.relit_count)
+        else e.relit_count=0
+        if(Number(e.relit_count)>0&&!e.ever_lit)throw Error('Relit lantern must have ever_lit')
       }
       if(k==='charms'){
         if('available' in e)bool(e.available)
@@ -57,8 +73,9 @@ export function parseScenario(raw:unknown,night:Night=1):Scenario{
         if(!('pos' in e)&&!islands[night].charms.some((_,i)=>e.id==='C'+(i+1)))throw Error('Charm needs a position')
       }
       if('pos' in e || (k!=='lanterns'&&k!=='charms'))vector(e.pos,3)
-      for(const key of ['state_ticks_left','stun_ticks','respawn_ticks','stolen'])if(key in e)nonnegative(e[key])
-      if('state' in e && !(k==='shades'?['wander','chase','spawning','recoil','stunned']:['idle','chase','flee']).includes(String(e.state)))throw Error('Invalid entity state')
+      for(const key of ['state_ticks_left','stun_ticks','respawn_ticks','stolen','relit_count'])if(key in e)nonnegative(e[key])
+      if('target_lantern_id' in e && (k!=='shades'||!islands[night].lamps.some((_,i)=>e.target_lantern_id==='L'+(i+1))))throw Error('Invalid target_lantern_id')
+      if('state' in e && !(k==='shades'?['wander','chase','spawning','recoil','stunned','drain']:['idle','chase','flee']).includes(String(e.state)))throw Error('Invalid entity state')
     }
     s[k]=entries
   }
@@ -71,16 +88,20 @@ export function applyScenario(w:Snapshot,s:Scenario){
     Object.assign(w.player,rest)
     w.player.dash_cd=dash_cd_ticks??0
     w.player.cooldown_ticks=pulse_cd_ticks??0
+    w.player.capacity=Math.min(contract.tuning.capacity_max,contract.tuning.carry_capacity+2*w.player.successful_lights)
   }
   if(s.time_left_s!==undefined)w.time_left_s=s.time_left_s
   if(s.motes)w.motes=(s.motes as Entity[]).map(m=>({...m,kind:'random',ttl:0}))
-  if(s.shades)w.shades=s.shades.map(v=>({id:v.id!,pos:v.pos,state:v.state??(v.stun_ticks?'stunned':'wander'),state_ticks_left:v.state_ticks_left??v.stun_ticks??(v.state==='spawning'?1:v.state==='stunned'?120:v.state==='recoil'?60:0),push_ticks:0,angle:0}))
+  if(s.shades)w.shades=s.shades.map(v=>({id:v.id!,pos:v.pos,state:v.state??(v.stun_ticks?'stunned':'wander'),state_ticks_left:v.state_ticks_left??v.stun_ticks??(v.state==='spawning'?1:v.state==='stunned'?120:v.state==='recoil'?60:0),push_ticks:0,angle:0,target_lantern_id:v.target_lantern_id}))
   if(s.drifters)w.drifters=s.drifters.map(v=>({state:'idle',stolen:0,state_ticks_left:v.state==='flee'?240:0,angle:0,...v,id:v.id!}))
   if(s.charms)w.charms=s.charms.map(v=>({available:true,respawn_ticks:0,...v,pos:v.pos??w.charms.find(c=>c.id===v.id)!.pos}))
   for(const patch of s.lanterns??[]){
     const lamp=w.lanterns.find(v=>v.id===patch.id)!
     Object.assign(lamp,patch)
-    if(patch.lit)lamp.deposited=contract.tuning.lantern_cost
-    lamp.lit=lamp.deposited===contract.tuning.lantern_cost
+    lamp.fuel_units=Math.round((patch.fuel??(patch.lit?contract.tuning.fuel_max:0))*60)
+    lamp.fuel=Math.round(lamp.fuel_units/60*10)/10
+    lamp.lit=patch.lit??false
+    lamp.ever_lit=patch.ever_lit??lamp.lit
+    lamp.relit_count=patch.relit_count??0
   }
 }

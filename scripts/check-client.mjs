@@ -2,7 +2,7 @@
 // Only the initial scenario is substituted; the UI, renderer and engine run normally.
 import {createServer} from 'vite'
 import assert from 'node:assert/strict'
-import {writeFileSync} from 'node:fs'
+import {mkdirSync,writeFileSync} from 'node:fs'
 import {connect} from './browser-session.mjs'
 const app=await createServer({server:{host:'127.0.0.1',port:4179,strictPort:true},plugins:[{
   name:'campaign-scenario',enforce:'pre',transform(code,id){
@@ -12,13 +12,14 @@ const app=await createServer({server:{host:'127.0.0.1',port:4179,strictPort:true
     return code.replace(from,`engine = new GameEngine(42,{
       player:{pos:[islands[night].lamps[0][0]+1.7,islands[night].lamps[0][1],islands[night].lamps[0][2]],carried:10},
       lanterns:islands[night].lamps.slice(1).map((_,i)=>({id:'L'+(i+2),lit:true})),
-      motes:[],shades:[],drifters:[]
+      motes:[],shades:[],drifters:[],time_left_s:5
     },night)`)
   }
 }]})
 await app.listen()
 const {send,js,wait,key,close}=await connect(process.argv[2])
-const out='docs/proof/phase-2',checks=[]
+const out='docs/proof/phase-3',checks=[]
+mkdirSync(out,{recursive:true})
 const click=id=>js("document.getElementById("+JSON.stringify(id)+").click()")
 async function press(code,letter){
   await key(code,letter,'keyDown');await wait(80);await key(code,letter,'keyUp');await wait(80)
@@ -51,7 +52,7 @@ try{
     if(night<3)await click('primary')
   }
   assert.match(checks[2].result,/Bình Minh/)
-  writeFileSync(out+'/campaign.json',JSON.stringify({fixture:'one deposit from victory per night',checks},null,2)+'\n')
+  writeFileSync(out+'/campaign.json',JSON.stringify({fixture:'QA campaign: one deposit, then survive to dawn',checks},null,2)+'\n')
   console.log(checks)
 }finally{
   await send('Page.navigate',{url:'http://127.0.0.1:4178/'})
