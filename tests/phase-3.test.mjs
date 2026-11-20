@@ -18,9 +18,9 @@ function run(night,ticks,scenario={},inputs=[],every=1){
   return {records,at:k=>records.find(s=>s.type==='snapshot'&&s.tick===k),events:n=>records.filter(s=>s.name===n),end:records.at(-1)}
 }
 
-test('contract v1.2 snapshots expose fuel and dynamic capacity',()=>{
+test('contract v1.3 snapshots preserve v1.2 fuel and dynamic capacity',()=>{
   const contract=JSON.parse(readFileSync('game.contract.json','utf8'))
-  assert.equal(contract.contract_version,'1.2')
+  assert.equal(contract.contract_version,'1.3')
   for(const [night,duration,count] of [[1,240,5],[2,270,6],[3,300,7]]){
     const r=run(night,0)
     assert.deepEqual([r.at(0).time_left_s,r.at(0).lanterns.length,r.at(0).player.capacity],[duration,count,10])

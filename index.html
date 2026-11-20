@@ -6,6 +6,48 @@
 <section class="panel" aria-label="Trạng thái trò chơi"><div id="lamps" aria-label="Tiến độ đèn"></div>
 <dl><div><dt>Lửa</dt><dd id="flames"></dd></div><div><dt>Đom đóm</dt><dd id="carried"></dd></div><div><dt>Điểm</dt><dd id="score"></dd></div><div><dt>Còn lại</dt><dd id="time"></dd></div></dl><div id="bag" aria-label="Túi đom đóm"></div><p id="cooldowns"></p><p id="hint"></p></section>
 <div id="beacon" hidden aria-label="Hướng đèn chưa sáng"></div>
-<footer><span><kbd>WASD</kbd> Di chuyển</span><span><kbd>J</kbd> Nhảy</span><span><kbd>E</kbd> Nạp đèn</span><span><kbd>F / Space</kbd> Xung sáng</span><span><kbd>Shift</kbd> Lướt</span><span><kbd>V</kbd> Camera</span><span><kbd>P / Esc</kbd> Tạm dừng</span></footer>
-<aside id="result" hidden><h2 id="message"></h2><p id="dialog-note"></p><div id="settings" hidden><label>Âm lượng <input id="volume" type="range" min="0" max="100"></label><label>Độ nhạy chuột <input id="sensitivity" type="range" min="1" max="100"></label><label><input id="colorblind" type="checkbox"> Bảng màu dễ phân biệt</label></div><div class="buttons"><button id="primary">Bắt đầu</button><button id="restart">Chơi lại đêm</button><button id="options">Cài đặt</button><button id="menu">Về menu</button></div></aside>
+<div id="alerts" role="status" aria-live="polite"></div><div id="beacon" hidden aria-label="Hướng đèn chưa sáng"></div><div id="shade-beacon" hidden aria-label="Hướng Bóng Mực"></div>
+<footer><span><kbd data-binding="moveUp">W</kbd> Lên</span><span><kbd data-binding="moveLeft">A</kbd> Trái</span><span><kbd data-binding="moveDown">S</kbd> Xuống</span><span><kbd data-binding="moveRight">D</kbd> Phải</span><span><kbd data-binding="jump">J</kbd> Nhảy</span><span><kbd data-binding="interact">E</kbd> Tương tác</span><span><kbd data-binding="pulse">F</kbd> Tỏa Sáng</span><span><kbd data-binding="dash">Shift</kbd> Lướt</span><span><kbd>V</kbd> Camera</span><span><kbd data-binding="pause">Esc</kbd> Tạm dừng</span></footer>
+<aside id="result" hidden>
+  <h2 id="message"></h2><p id="dialog-note"></p>
+  <section id="settings" hidden aria-labelledby="settings-title">
+    <h3 id="settings-title">Cài đặt</h3>
+    <label>Âm lượng <input id="volume" type="range" min="0" max="100" aria-label="Âm lượng"></label>
+    <label>Độ nhạy chuột <input id="sensitivity" type="range" min="1" max="100" aria-label="Độ nhạy chuột"></label>
+    <label><input id="colorblind" type="checkbox"> Bảng màu dễ phân biệt</label>
+    <label><input id="reduce-motion" type="checkbox"> Giảm chuyển động</label>
+    <label><input id="large-text" type="checkbox"> Chữ lớn (×1,25)</label>
+    <h3 id="bindings-title">Đổi phím</h3>
+    <p id="binding-help">Chọn một hành động rồi nhấn phím mới. Mỗi phím chỉ dùng cho một hành động.</p>
+    <div class="binding-row"><span>Di chuyển lên</span><button type="button" data-action="moveUp">W</button></div>
+    <div class="binding-row"><span>Di chuyển trái</span><button type="button" data-action="moveLeft">A</button></div>
+    <div class="binding-row"><span>Di chuyển xuống</span><button type="button" data-action="moveDown">S</button></div>
+    <div class="binding-row"><span>Di chuyển phải</span><button type="button" data-action="moveRight">D</button></div>
+    <div class="binding-row"><span>Nhảy</span><button type="button" data-action="jump">J</button></div>
+    <div class="binding-row"><span>Lướt</span><button type="button" data-action="dash">Shift</button></div>
+    <div class="binding-row"><span>Tương tác</span><button type="button" data-action="interact">E</button></div>
+    <div class="binding-row"><span>Tỏa Sáng</span><button type="button" data-action="pulse">F</button></div>
+    <div class="binding-row"><span>Tạm dừng</span><button type="button" data-action="pause">Escape</button></div>
+    <button id="reset-bindings" type="button">Khôi phục mặc định</button>
+    <p id="settings-message" role="status" aria-live="polite"></p>
+  </section>
+  <section id="score-entry" hidden aria-labelledby="score-entry-title">
+    <h3 id="score-entry-title">Lưu điểm</h3>
+    <p id="score-summary"></p>
+    <label for="player-name">Tên (3–12 chữ cái, số hoặc _)</label>
+    <input id="player-name" type="text" required minlength="3" maxlength="12" pattern="[A-Za-z0-9_]{3,12}" autocomplete="nickname">
+    <button id="save-score" type="button">Lưu vào bảng xếp hạng</button>
+    <p id="save-message" role="status" aria-live="polite"></p>
+  </section>
+  <section id="leaderboard-panel" hidden aria-labelledby="leaderboard-title">
+    <h3 id="leaderboard-title">Top 10</h3>
+    <ol id="leaderboard-list"></ol>
+    <p id="leaderboard-message" role="status"></p>
+  </section>
+  <div class="buttons">
+    <button id="primary">Bắt đầu</button><button id="restart">Chơi lại đêm</button>
+    <button id="leaderboard-open" type="button">Bảng xếp hạng</button>
+    <button id="options">Cài đặt</button><button id="menu">Về menu</button>
+  </div>
+</aside>
 </main><script type="module" src="/src/client/main.ts"></script></body></html>

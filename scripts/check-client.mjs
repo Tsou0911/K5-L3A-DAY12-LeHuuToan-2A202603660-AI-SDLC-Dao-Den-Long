@@ -7,7 +7,7 @@ import {connect} from './browser-session.mjs'
 const app=await createServer({server:{host:'127.0.0.1',port:4179,strictPort:true},plugins:[{
   name:'campaign-scenario',enforce:'pre',transform(code,id){
     if(!id.replaceAll('\\','/').endsWith('/src/client/main.ts'))return
-    const from='engine = new GameEngine(42,{},night)'
+    const from='engine = new GameEngine(gameSeed,{},night)'
     if(!code.includes(from))throw Error('Campaign scenario injection point changed')
     return code.replace(from,`engine = new GameEngine(42,{
       player:{pos:[islands[night].lamps[0][0]+1.7,islands[night].lamps[0][1],islands[night].lamps[0][2]],carried:10},

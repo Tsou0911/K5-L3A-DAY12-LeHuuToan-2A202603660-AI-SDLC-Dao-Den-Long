@@ -1,0 +1,87 @@
+
+> dao-den-long@0.1.0 test
+> npm run build:headless && esbuild tests/phase-1.test.ts --bundle --platform=node --format=esm --outfile=dist/tests/phase-1.test.js && esbuild tests/phase-4.test.ts --bundle --platform=node --format=esm --outfile=dist/tests/phase-4.test.js && node --test dist/tests/phase-1.test.js dist/tests/phase-4.test.js tests/phase-2.test.mjs tests/phase-3.test.mjs tests/phase-4.test.mjs
+
+
+> dao-den-long@0.1.0 build:headless
+> esbuild scripts/headless.ts --bundle --platform=node --format=esm --outfile=dist/headless.js && esbuild scripts/soak.ts --bundle --platform=node --format=esm --outfile=dist/soak.js
+
+✔ tick zero applies scenario by id without scoring or modifying defaults (7.2126ms)
+✔ seed controls world and repeated simulations match (13.2467ms)
+✔ normalized movement and camera-relative forward (1.96ms)
+✔ pickup consumes one mote; scoring waits for deposit (1.1467ms)
+✔ lighting all lanterns does not win early; dawn survival awards the v1.2 score (2.7448ms)
+✔ pulse spends energy, pushes, stuns, and respects cooldown (0.6151ms)
+✔ shade damage drops carried motes, then protects for ninety ticks (9.958ms)
+✔ loss on last flame and timeout (0.9099ms)
+✔ partial input, idle defaults and rising edges (0.5321ms)
+✔ reject malformed scenario and input (0.6567ms)
+✔ contract rejects negative tuning and blank commands and fills omissions (0.2137ms)
+✔ scenario reserves explicit IDs before naming anonymous entities (0.2289ms)
+✔ pickup and hit height limits, pulse sphere and safe zone boundaries (1.5407ms)
+✔ fall damage and final flame have consistent events (0.2199ms)
+✔ reinforcements report the ID inserted into the world (8.9783ms)
+✔ move limits and all four rising edges (0.2571ms)
+✔ CLI emits rounded snapshots, immediate events, default interval and identical bytes (309.1092ms)
+✔ CLI rejects broken JSON and invalid structures with status 2 and stderr (451.0452ms)
+✔ v1.3 declares runnable benchmark and soak commands (2.5627ms)
+✔ benchmark scenario is seeded and has the required fixed entity counts (10.8025ms)
+✔ benchmark ticks move Shades without advancing the night or changing fuel (42.0519ms)
+✔ three night configurations and scheduled spawns (725.4441ms)
+✔ pause stops all simulation clocks; dash on air holds height for twelve ticks; facing starts +Z (366.3076ms)
+✔ fall ignores immunity and only hits once, respawn at tick 61 (90.1649ms)
+✔ drop ring and TTL; sorted single hit and drifter steals before shade (204.5943ms)
+✔ charm refresh, free dashes, respawn after 2700 sim ticks (410.4606ms)
+✔ drifter steals in safe zone despite immunity, releases motes when pulsed in flee (299.1979ms)
+✔ last tick dawn wins at the new score and expels a shade without damage (101.861ms)
+✔ jump pads, bridge, tower, night-three warning interval and seeded wind (369.0928ms)
+✔ acceleration, air control, jump and braking; grounded input cannot double-jump (127.0788ms)
+✔ pulse refreshes an existing stun, pushes 4 m in 15 ticks and refuses insufficient fuel (255.895ms)
+✔ new random mote waits until next tick; occupied points skip spawning (383.5083ms)
+✔ drifter chased away by pulse cannot steal and disappears after 240 simulation ticks (116.5324ms)
+✔ partial deposit resolves ties by ID, loss has priority over lit lamps (225.3825ms)
+✔ dash never prevents contact; charm speed and second pickup refresh (296.4738ms)
+✔ pause freezes TTL, charm respawn and shade scheduling (145.0147ms)
+✔ shade detection, release and speed use the active night (317.3878ms)
+✔ bridge supports grounded travel and open water does not; ramps climb and walls block (442.2971ms)
+✔ wind cancels by scenario; drifters idle when eligibility is lost (308.3792ms)
+✔ contract v1.3 snapshots preserve v1.2 fuel and dynamic capacity (494.1811ms)
+✔ fuel decays by one unit per tick and extinguishes at zero (516.5804ms)
+✔ a lamp retains safety at 30 fuel but loses it below 30 (182.3755ms)
+✔ pause freezes lamp fuel; resumed simulation resumes decay (78.9805ms)
+✔ relight uses five motes, scores correctly and grows capacity (84.0596ms)
+✔ refuel uses carried motes, caps fuel and scores each mote once (79.5723ms)
+✔ refuel selects the nearest weak lantern and breaks distance ties by ID (124.2412ms)
+✔ multiple shades drain cumulatively and emit ordered events every 60 simulation ticks (110.0037ms)
+✔ wander shades drain the nearest weak lantern before any unlit lantern (137.3818ms)
+✔ a drainer returns to wander when its lamp goes out or it leaves the two-metre range (216.4ms)
+✔ drain pulse scores fifteen total; entering six metres makes a drainer chase (260.438ms)
+✔ refueling to thirty expels a shade without damage during the expulsion (88.3344ms)
+✔ dawn requires the night-specific ratio and awards no time bonus (670.4567ms)
+✔ no flames take precedence over dawn survival (106.1134ms)
+✔ one-night soak writes the required report in one run (220.3034ms)
+✔ leaderboard validates, ranks, caps at ten, persists, and exports (370.8381ms)
+ℹ tests 55
+ℹ suites 0
+ℹ pass 55
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5647.1055
+
+  dist\headless.js  40.4kb
+
+Done in 50ms
+
+  dist\soak.js  37.9kb
+
+Done in 28ms
+
+  dist\tests\phase-1.test.js  48.6kb
+
+Done in 36ms
+
+  dist\tests\phase-4.test.js  37.6kb
+
+Done in 25ms

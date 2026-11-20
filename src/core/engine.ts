@@ -58,6 +58,12 @@ export class GameEngine {
     this.remaining=Math.ceil(this.w.time_left_s*HZ)
   }
   snapshot(){return structuredClone(this.w)}
+  get outcome(){return this.w.state}
+  benchmarkStep(){
+    this.w.tick++;this.w.sim_tick++;this.events=[]
+    this.agents(false)
+    return this.w
+  }
   private random(){this.randomState=(Math.imul(1664525,this.randomState)+1013904223)>>>0;return this.randomState/4294967296}
   private pick<T>(items:T[]){return items[Math.floor(this.random()*items.length)]}
   private emit(e:Payload<EngineEvent>){this.events.push({type:'event',tick:this.w.tick,...e})}
@@ -67,6 +73,28 @@ export class GameEngine {
   }
   private protected(l:Snapshot['lanterns'][number]){
     return l.lit&&l.fuel_units>=fuelUnits(t.low_fuel_threshold)
+  }
+  private nearestWeakLantern(pos:Vec3){
+    let nearest:Snapshot['lanterns'][number]|undefined,distance=Infinity
+    for(const lantern of this.w.lanterns){
+      if(!lantern.lit||lantern.fuel_units>=fuelUnits(t.low_fuel_threshold))continue
+      const current=planar(lantern.pos,pos)
+      if(current<distance||(current===distance&&nearest&&byId(lantern,nearest)<0)){
+        nearest=lantern;distance=current
+      }
+    }
+    return nearest
+  }
+  private nearestUnlitLantern(pos:Vec3){
+    let nearest:Snapshot['lanterns'][number]|undefined,distance=Infinity
+    for(const lantern of this.w.lanterns){
+      if(lantern.lit)continue
+      const current=planar(lantern.pos,pos)
+      if(current<distance||(current===distance&&nearest&&byId(lantern,nearest)<0)){
+        nearest=lantern;distance=current
+      }
+    }
+    return nearest
   }
   private requiredLights(){return Math.ceil(t.win_ratio*this.w.lanterns.length)}
   private spawnMote(){
@@ -289,9 +317,8 @@ export class GameEngine {
         continue
       }
       s.state='wander'
-      const weak=w.lanterns.filter(l=>l.lit&&l.fuel_units<fuelUnits(t.low_fuel_threshold))
-        .sort((a,b)=>planar(s.pos,a.pos)-planar(s.pos,b.pos)||byId(a,b))[0]
-      const target=weak??w.lanterns.filter(l=>!l.lit).sort((a,b)=>planar(s.pos,a.pos)-planar(s.pos,b.pos)||byId(a,b))[0]
+      const weak=this.nearestWeakLantern(s.pos)
+      const target=weak??this.nearestUnlitLantern(s.pos)
       if(target){
         s.target_lantern_id=target.id
         const distance=planar(s.pos,target.pos)

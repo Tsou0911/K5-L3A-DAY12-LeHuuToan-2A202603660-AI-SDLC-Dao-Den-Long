@@ -8,9 +8,12 @@
   },
   "scripts": {
     "dev": "vite",
+    "start": "node scripts/run.mjs",
     "build": "tsc --noEmit && vite build && npm run build:headless",
-    "build:headless": "esbuild scripts/headless.ts --bundle --platform=node --format=esm --outfile=dist/headless.js",
-    "test": "npm run build:headless && esbuild tests/phase-1.test.ts --bundle --platform=node --format=esm --outfile=dist/tests/phase-1.test.js && node --test dist/tests/phase-1.test.js tests/phase-2.test.mjs tests/phase-3.test.mjs"
+    "build:headless": "esbuild scripts/headless.ts --bundle --platform=node --format=esm --outfile=dist/headless.js && esbuild scripts/soak.ts --bundle --platform=node --format=esm --outfile=dist/soak.js",
+    "bench": "node scripts/bench.mjs",
+    "soak": "node --expose-gc --max-old-space-size=32 --max-semi-space-size=1 dist/soak.js",
+    "test": "npm run build:headless && esbuild tests/phase-1.test.ts --bundle --platform=node --format=esm --outfile=dist/tests/phase-1.test.js && esbuild tests/phase-4.test.ts --bundle --platform=node --format=esm --outfile=dist/tests/phase-4.test.js && node --test dist/tests/phase-1.test.js dist/tests/phase-4.test.js tests/phase-2.test.mjs tests/phase-3.test.mjs tests/phase-4.test.mjs"
   },
   "dependencies": {
     "three": "0.176.0"

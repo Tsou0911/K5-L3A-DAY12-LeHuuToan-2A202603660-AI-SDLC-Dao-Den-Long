@@ -1,5 +1,9 @@
 # Credits
 
-Đảo Đèn Lồng và nhân vật Mây xuất phát từ đề bài Day 12 AI SDLC. Hình học đảo, đèn, nhân vật và mây được dựng bằng mã trong dự án. Codex hỗ trợ triển khai và viết kiểm thử. Three.js, Vite và esbuild dùng giấy phép MIT. TypeScript dùng Apache-2.0.
+- Game concept, island names, and Mây are based on the Day 12 AI SDLC assignment.
+- Island geometry, lanterns, character, Shades, Drifters, visual alerts, and UI are created procedurally in this repository; no external image, model, or sound files are used.
+- Night music and sound effects are synthesized at runtime with Web Audio in `src/client/sound.ts`.
+- AI-assisted implementation and tests: Codex (earlier phases) and GitHub Copilot (Phase 4).
+- Runtime/build dependencies: Three.js, Vite, esbuild, and TypeScript. Their license notices are distributed with their respective packages.
 
-Phase 2 dùng hình học Three.js tự dựng cho cầu, dốc, tháp, bùa, dải lụa và lá gió. Nhạc đêm cùng hiệu ứng được tổng hợp trực tiếp bằng Web Audio trong src/client/sound.ts.
+Phase 2's bridge, ramps, tower, charms, ribbons, and wind leaves use project-authored Three.js geometry.

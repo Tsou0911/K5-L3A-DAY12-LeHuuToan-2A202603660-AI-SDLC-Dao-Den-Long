@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bằng chứng Phase 4 · Đảo Đèn Lồng</title>
+  <style>
+    :root{font:18px/1.5 "Segoe UI","Noto Sans",system-ui,sans-serif;color:#f5f1e6;background:#11152e}
+    body{max-width:980px;margin:0 auto;padding:32px 20px}
+    h1{font-size:30px;line-height:1.2}h2{font-size:21px;margin:0 0 8px}
+    main{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+    section{padding:18px;background:#1f1d39;border:1px solid #554b68;border-radius:14px}
+    pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+    a{color:#ffd388}p{margin:8px 0}
+  </style>
+</head>
+<body>
+  <h1>Đảo Đèn Lồng — Phase 4</h1>
+  <p>Bằng chứng được đọc từ kết quả test và JSON của lần chạy trong repo.</p>
+  <main>
+    <section><h2>Regression tests</h2><pre id="tests">Đang đọc tests.txt…</pre></section>
+    <section><h2>Headless</h2><pre id="headless">Đang đọc JSONL…</pre><p><a href="./headless.jsonl">Mở JSONL đầy đủ</a></p></section>
+    <section><h2>Benchmark</h2><pre id="bench">Đang đọc bench.json…</pre><p><a href="./bench.json">Mở JSON đầy đủ</a></p></section>
+    <section><h2>Soak</h2><pre id="soak">Đang đọc soak.json…</pre><p><a href="./soak.json">Mở JSON đầy đủ</a></p></section>
+  </main>
+  <script>
+    async function loadEvidence(){
+      const [tests,headless,bench,soak]=await Promise.all([
+        fetch('./tests.txt').then(response=>{if(!response.ok)throw Error('tests.txt: HTTP '+response.status);return response.text()}),
+        fetch('./headless.jsonl').then(response=>{if(!response.ok)throw Error('headless.jsonl: HTTP '+response.status);return response.text()}),
+        fetch('./bench.json').then(response=>{if(!response.ok)throw Error('bench.json: HTTP '+response.status);return response.json()}),
+        fetch('./soak.json').then(response=>{if(!response.ok)throw Error('soak.json: HTTP '+response.status);return response.json()})
+      ])
+      const testLine=tests.match(/ℹ tests (\d+)/),passLine=tests.match(/ℹ pass (\d+)/),failLine=tests.match(/ℹ fail (\d+)/)
+      document.querySelector('#tests').textContent=testLine&&passLine&&failLine
+        ?`${passLine[1]} / ${testLine[1]} passed · ${failLine[1]} failed`
+        :'Could not parse test summary; see the full log.'
+      const records=headless.trim().split(/\r?\n/).map(line=>JSON.parse(line))
+      const end=records.find(record=>record.type==='end')
+      const gameOver=records.find(record=>record.type==='event'&&record.name==='game_over')
+      document.querySelector('#headless').textContent=end
+        ?`${end.state} · ${end.ticks} tick(s) · score ${end.score} · ${gameOver?.data.reason??'no game_over event'}`
+        :'No final record in headless JSONL.'
+      document.querySelector('#bench').textContent=
+        `${bench.frames} frames · ${bench.avg_fps} avg FPS · ${bench.p1_low_fps} p1-low FPS · ${bench.load_ms} ms load`
+      document.querySelector('#soak').textContent=
+        `${soak.nights} nights · ${soak.crashes} crashes · ${soak.mem_start_mb} → ${soak.mem_end_mb} MB RSS`
+    }
+    loadEvidence().catch(error=>{
+      document.querySelector('body').insertAdjacentText('beforeend','Evidence load failed: '+(error instanceof Error?error.message:String(error)))
+    })
+  </script>
+</body>
+</html>
